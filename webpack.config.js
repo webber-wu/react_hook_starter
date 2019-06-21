@@ -20,6 +20,9 @@ var config = {
       path.resolve(__dirname, "src/component"),
       path.resolve(__dirname, "src/container"),
       path.resolve(__dirname, "src/module"),
+      path.resolve(__dirname, "src/redux"),
+      path.resolve(__dirname, "src/redux/action"),
+      path.resolve(__dirname, "src/redux/reducer"),
       "node_modules"
     ]
   },

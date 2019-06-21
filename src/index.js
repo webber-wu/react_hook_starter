@@ -1,7 +1,8 @@
 import App from "App";
 import ReactDOM from "react-dom";
-import { Fragment } from "react";
 import { HashRouter, BrowserRouter } from "react-router-dom";
+import { StoreContext } from "redux-react-hook";
+import { store } from "./redux/store";
 
 let AppRouter =
   process.env.DEMO == "demo" ? (
@@ -16,7 +17,7 @@ let AppRouter =
 
 window.onload = () => {
   ReactDOM.render(
-    <Fragment>{AppRouter}</Fragment>,
+    <StoreContext.Provider value={store}>{AppRouter}</StoreContext.Provider>,
     document.getElementById("app")
   );
 };
