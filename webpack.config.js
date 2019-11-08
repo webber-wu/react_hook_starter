@@ -64,6 +64,16 @@ var config = {
     new CopyWebpackPlugin([{ from: "src/asset", to: "asset" }]),
     new ImageminPlugin({ test: /\.(jpe?g|png|gif|svg)$/i })
   ],
+  //壓縮js
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: false
+        }
+      })
+    ]
+  },
   module: {
     rules: [
       {
@@ -135,25 +145,10 @@ module.exports = (env, argv) => {
         })
       ]);
     }
-    (config.devServer = {}),
-      (config.plugins = config.plugins.concat([
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            comments: false,
-            compress: {
-              warnings: false,
-              drop_console: true // remove all console.log
-            },
-            output: {
-              beautify: false,
-              comments: false
-            },
-            nameCache: null,
-            sourceMap: true
-          }
-        }),
-        new ExtractTextPlugin("styles.css")
-      ]));
+    // (config.devServer = {}),
+    config.plugins = config.plugins.concat([
+      new ExtractTextPlugin("styles.css")
+    ]);
   }
 
   return config;

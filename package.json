@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --open --mode=development",
-    "demo": "webpack --mode=production --env.demo"
+    "demo": "webpack --mode=production --env.demo",
+    "pro": "webpack --mode=production"
   },
   "dependencies": {
     "@babel/core": "^7.4.4",
@@ -17,7 +18,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "copy-webpack-plugin": "^5.0.3",
     "css-loader": "^2.1.1",
-    "extract-text-webpack-plugin": "^3.0.2",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^3.0.1",
     "html-webpack-plugin": "^3.2.0",
     "imagemin-webpack-plugin": "^2.4.2",
