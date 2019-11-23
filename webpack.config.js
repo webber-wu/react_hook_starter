@@ -68,7 +68,7 @@ config = {
     new webpack.optimize.AggressiveMergingPlugin(),
     new CopyWebpackPlugin([
       { from: "src/asset", to: "asset" },
-      { from: "src/public", to: "public" }
+      // { from: "src/public", to: "public" }
     ]),
     new ImageminPlugin({ test: /\.(jpe?g|png|gif|svg)$/i }),
     new MiniCssExtractPlugin({
@@ -79,6 +79,16 @@ config = {
       ignoreOrder: false // Enable to remove warnings about conflicting order
     })
   ],
+  //壓縮js
+  optimization: {
+    minimizer: [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          compress: false
+        }
+      })
+    ]
+  },
   module: {
     rules: [
       {
@@ -137,6 +147,5 @@ module.exports = (env, argv) => {
         })
       ]);
     }
-  }
   return config;
 };
