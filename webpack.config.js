@@ -1,12 +1,13 @@
-var path = require("path");
-var webpack = require("webpack");
-var HtmlWebpackPlugin = require("html-webpack-plugin");
-var CopyWebpackPlugin = require("copy-webpack-plugin");
-var ImageminPlugin = require("imagemin-webpack-plugin").default;
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ImageminPlugin = require("imagemin-webpack-plugin").default;
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const TerserJSPlugin = require("terser-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 
-var config = {
+config = {
   entry: "./src/index",
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -26,6 +27,9 @@ var config = {
       "node_modules"
     ]
   },
+  optimization: {
+    minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})]
+  },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
@@ -38,6 +42,7 @@ var config = {
       React: "react",
       useState: ["react", "useState"],
       useEffect: ["react", "useEffect"],
+      useRef: ["react", "useRef"],
       Fragment: ["react", "Fragment"],
       Provider: ["react-redux", "Provider"],
       connect: ["react-redux", "connect"],
@@ -61,29 +66,21 @@ var config = {
       RetinaImage: "react-retina-image"
     }),
     new webpack.optimize.AggressiveMergingPlugin(),
-    new CopyWebpackPlugin([{ from: "src/asset", to: "asset" }]),
-    new ImageminPlugin({ test: /\.(jpe?g|png|gif|svg)$/i })
+    new CopyWebpackPlugin([
+      { from: "src/asset", to: "asset" },
+      { from: "src/public", to: "public" }
+    ]),
+    new ImageminPlugin({ test: /\.(jpe?g|png|gif|svg)$/i }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // all options are optional
+      filename: "[name].css",
+      chunkFilename: "[id].css",
+      ignoreOrder: false // Enable to remove warnings about conflicting order
+    })
   ],
   module: {
     rules: [
-      {
-        test: /\.css$/,
-        use: [
-          "style-loader",
-          {
-            loader: "css-loader",
-            options: { importLoaders: 1, sourceMap: true }
-          },
-          "postcss-loader"
-        ]
-      },
-
-      // {
-      //   enforce: "pre",
-      //   test: /\.js$/,
-      //   exclude: /node_modules/,
-      //   loader: "eslint-loader"
-      // },
       {
         test: /\.m?js$/,
         exclude: /(node_modules|bower_components)/,
@@ -96,6 +93,19 @@ var config = {
         }
       },
       {
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: process.env.NODE_ENV === "development"
+            }
+          },
+          "css-loader",
+          "postcss-loader"
+        ]
+      },
+      {
         test: /\.json$/,
         use: "json-loader"
       },
@@ -104,29 +114,21 @@ var config = {
         use:
           "file-loader?name=[name].[ext]&publicPath=asset/image/&outputPath=asset/image/"
       }
-      // {
-      //     test: /\.(woff2|woff|ttf)$/,
-      //     use: 'file-loader?name=[name].[ext]&publicPath=asset/font/&outputPath=asset/font/'
-      // },
     ]
   },
   devServer: {
     contentBase: "src",
     hot: true,
     historyApiFallback: true,
-    port: 7777
+    port: 1212
   }
 };
 
 module.exports = (env, argv) => {
-  if (argv.mode === "development") {
-    config.devtool = "source-map";
-  }
-
   if (argv.mode === "production") {
     if (env) {
       config.output.publicPath = env.demo
-        ? "http://demo.dosomething-studio.com/XXX/"
+        ? "http://demo.dosomething-studio.com/ds2019/"
         : "/";
       config.plugins = config.plugins.concat([
         new webpack.DefinePlugin({
@@ -135,26 +137,6 @@ module.exports = (env, argv) => {
         })
       ]);
     }
-    (config.devServer = {}),
-      (config.plugins = config.plugins.concat([
-        new UglifyJsPlugin({
-          uglifyOptions: {
-            comments: false,
-            compress: {
-              warnings: false,
-              drop_console: true // remove all console.log
-            },
-            output: {
-              beautify: false,
-              comments: false
-            },
-            nameCache: null,
-            sourceMap: true
-          }
-        }),
-        new ExtractTextPlugin("styles.css")
-      ]));
   }
-
   return config;
 };
