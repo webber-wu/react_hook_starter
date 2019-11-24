@@ -68,7 +68,7 @@ config = {
     new webpack.optimize.AggressiveMergingPlugin(),
     new CopyWebpackPlugin([
       { from: "src/asset", to: "asset" },
-      // { from: "src/public", to: "public" }
+      { from: "src/public", to: "public" }
     ]),
     new ImageminPlugin({ test: /\.(jpe?g|png|gif|svg)$/i }),
     new MiniCssExtractPlugin({
@@ -79,16 +79,6 @@ config = {
       ignoreOrder: false // Enable to remove warnings about conflicting order
     })
   ],
-  //壓縮js
-  optimization: {
-    minimizer: [
-      new UglifyJsPlugin({
-        uglifyOptions: {
-          compress: false
-        }
-      })
-    ]
-  },
   module: {
     rules: [
       {
@@ -130,11 +120,15 @@ config = {
     contentBase: "src",
     hot: true,
     historyApiFallback: true,
-    port: 1212
+    port: 7777
   }
 };
 
 module.exports = (env, argv) => {
+  if (argv.mode === "development") {
+    config.devtool = "source-map";
+  }
+
   if (argv.mode === "production") {
     if (env) {
       config.output.publicPath = env.demo
@@ -143,9 +137,27 @@ module.exports = (env, argv) => {
       config.plugins = config.plugins.concat([
         new webpack.DefinePlugin({
           "process.env.PUBLIC_PATH": JSON.stringify(config.output.publicPath),
-          "process.env.DEMO": JSON.stringify("demo")
+          "process.env.DEMO": JSON.stringify("demo"),
+          "process.env.NODE_ENV": JSON.stringify("production")
+        })
+      ]);
+    } else {
+      config.plugins = config.plugins.concat([
+        new webpack.DefinePlugin({
+          "process.env.PUBLIC_PATH": JSON.stringify(""),
+          "process.env.DEMO": JSON.stringify(""),
+          "process.env.NODE_ENV": JSON.stringify("production")
         })
       ]);
     }
+    config.devServer = {};
+  } else {
+    config.plugins = config.plugins.concat([
+      new webpack.DefinePlugin({
+        "process.env.PUBLIC_PATH": JSON.stringify(""),
+        "process.env.NODE_ENV": JSON.stringify("development")
+      })
+    ]);
+  }
   return config;
 };
