@@ -1,5 +1,5 @@
 const About = () => {
-  return <div>About</div>;
+  return <NavLink to="/">Home</NavLink>;
 };
 
 export default About;

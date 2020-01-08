@@ -1,8 +1,8 @@
 import * as types from "./actionType";
 
-export const increment = counter => {
+export const xxxxxx = counter => {
   return {
-    type: types.INCREMENT,
+    type: types.XXXXXX,
     counter
   };
 };

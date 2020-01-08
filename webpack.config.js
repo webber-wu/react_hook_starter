@@ -43,6 +43,8 @@ config = {
       useState: ["react", "useState"],
       useEffect: ["react", "useEffect"],
       useRef: ["react", "useRef"],
+      useCallBack: ["react", "useCallBack"],
+      useMemo: ["react", "useMemo"],
       Fragment: ["react", "Fragment"],
       Provider: ["react-redux", "Provider"],
       connect: ["react-redux", "connect"],
@@ -67,8 +69,8 @@ config = {
     }),
     new webpack.optimize.AggressiveMergingPlugin(),
     new CopyWebpackPlugin([
-      { from: "src/asset", to: "asset" },
-      { from: "src/public", to: "public" }
+      { from: "src/asset", to: "asset" }
+      // { from: "src/public", to: "public" }
     ]),
     new ImageminPlugin({ test: /\.(jpe?g|png|gif|svg)$/i }),
     new MiniCssExtractPlugin({
@@ -93,26 +95,25 @@ config = {
         }
       },
       {
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              hmr: process.env.NODE_ENV === "development"
-            }
-          },
-          "css-loader",
-          "postcss-loader"
-        ]
-      },
-      {
         test: /\.json$/,
         use: "json-loader"
       },
       {
+        test: /\.exec\.js$/,
+        use: ["script-loader"]
+      },
+      {
         test: /\.(jpg|png|svg)$/,
-        use:
-          "file-loader?name=[name].[ext]&publicPath=asset/image/&outputPath=asset/image/"
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "[name].[ext]",
+              publicPath: "../asset/image",
+              outputPath: "../asset/image"
+            }
+          }
+        ]
       }
     ]
   },
@@ -120,7 +121,7 @@ config = {
     contentBase: "src",
     hot: true,
     historyApiFallback: true,
-    port: 7777
+    port: 4000
   }
 };
 
@@ -132,7 +133,7 @@ module.exports = (env, argv) => {
   if (argv.mode === "production") {
     if (env) {
       config.output.publicPath = env.demo
-        ? "http://demo.dosomething-studio.com/ds2019/"
+        ? "http://demo.dosomething-studio.com/xxxxx/"
         : "/";
       config.plugins = config.plugins.concat([
         new webpack.DefinePlugin({
@@ -144,19 +145,40 @@ module.exports = (env, argv) => {
     } else {
       config.plugins = config.plugins.concat([
         new webpack.DefinePlugin({
-          "process.env.PUBLIC_PATH": JSON.stringify(""),
+          "process.env.PUBLIC_PATH": JSON.stringify("/"),
           "process.env.DEMO": JSON.stringify(""),
           "process.env.NODE_ENV": JSON.stringify("production")
         })
       ]);
     }
-    config.devServer = {};
+    config.module.rules = config.module.rules.concat([
+      {
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: process.env.NODE_ENV === "development",
+              reloadAll: true
+            }
+          },
+          "css-loader",
+          "postcss-loader"
+        ]
+      }
+    ]);
   } else {
     config.plugins = config.plugins.concat([
       new webpack.DefinePlugin({
-        "process.env.PUBLIC_PATH": JSON.stringify(""),
+        "process.env.PUBLIC_PATH": JSON.stringify("/"),
         "process.env.NODE_ENV": JSON.stringify("development")
       })
+    ]);
+    config.module.rules = config.module.rules.concat([
+      {
+        test: /\.(sa|sc|c)ss$/,
+        use: ["style-loader", "css-loader", "postcss-loader"]
+      }
     ]);
   }
   return config;

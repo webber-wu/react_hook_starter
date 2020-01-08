@@ -1,4 +1,9 @@
-function FBScript() {
+import { useDispatch } from "redux-react-hook";
+import { FBInitialized } from "../redux/action/rootAction";
+
+const FBScript = () => {
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const fbScript = document.createElement("script");
     document.body.appendChild(fbScript);
@@ -11,18 +16,19 @@ function FBScript() {
       window.fbAsyncInit = function() {
         FB.init({
           appId: appId,
-          autoLogAppEvents: true,
+          cookie: true,
           xfbml: true,
-          version: "v2.11"
+          version: "v5.0"
         });
         window.fbInited = true;
+        dispatch(FBInitialized());
+        FB.AppEvents.logPageView();
       };
     };
     fbScript.src = "https://connect.facebook.net/en_US/sdk.js";
-    return () => {};
   }, []);
 
   return null;
-}
+};
 
 export default FBScript;
