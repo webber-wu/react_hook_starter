@@ -31,8 +31,7 @@ let postCSSConfig = {
                     variables: variables
                 }
             }
-        },
-        'lost': {},
+        }
     }
 }
 
