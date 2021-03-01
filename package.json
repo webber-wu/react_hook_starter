@@ -22,7 +22,7 @@
     "redux-react-hook": "^3.3.2",
     "superagent": "^5.0.5",
     "swiper": "^5.2.0",
-    "three": "^0.110.0"
+    "three": "^0.125.0"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",
